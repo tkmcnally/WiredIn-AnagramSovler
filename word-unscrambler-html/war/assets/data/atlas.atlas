@@ -1,0 +1,12 @@
+
+atlas.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+splashLogo
+  rotate: false
+  xy: 1, 1
+  size: 248, 142
+  orig: 248, 142
+  offset: 0, 0
+  index: -1

@@ -1,0 +1,5 @@
+debug
+* spacing:10 padding:2 align:center
+'Welcome' spacingBottom:20
+---
+[inputTextButton] width:200 height:20
