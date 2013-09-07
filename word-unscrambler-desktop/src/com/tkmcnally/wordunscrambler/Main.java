@@ -9,8 +9,8 @@ public class Main {
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "word-unscrambler";
 		cfg.useGL20 = false;
-		cfg.width = 480;
-		cfg.height = 800;
+		cfg.width = 1080;
+		cfg.height = 1920;
 
 
 		new LwjglApplication(new MyGdxGame(new DesktopActionResolver()), cfg);

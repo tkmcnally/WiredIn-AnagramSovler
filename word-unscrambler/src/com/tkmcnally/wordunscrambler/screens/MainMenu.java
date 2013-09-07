@@ -33,7 +33,7 @@ import com.tkmcnally.wordunscrambler.unscrambler.Unscrambler;
 
 public class MainMenu implements Screen {
 
-	private static final int MAX_RESULTS  = 5;
+	private static final int MAX_RESULTS = 5;
 
 	private MyGdxGame game;
 	private SpriteBatch batch;
@@ -222,7 +222,7 @@ public class MainMenu implements Screen {
 		batch = new SpriteBatch();
 		font = new BitmapFont();
 
-		backgroundTexture = new Texture(Gdx.files.internal("data/background1.png"));
+		backgroundTexture = new Texture(Gdx.files.internal("data/bg_1920-1080.png"));
 		background = new Image(backgroundTexture);
 
 

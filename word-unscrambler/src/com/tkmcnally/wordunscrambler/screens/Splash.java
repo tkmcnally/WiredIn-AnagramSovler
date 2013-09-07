@@ -80,7 +80,7 @@ public class Splash implements Screen {
 		tweenManager = new TweenManager(); 
 		Tween.registerAccessor(Sprite.class, new SpriteAccessor());
 		
-		backgroundTexture = new Texture(Gdx.files.internal("data/background1.png"));
+		backgroundTexture = new Texture(Gdx.files.internal("data/bg_1920-1080.png"));
 		background = new Sprite(backgroundTexture);
 		
 		logoTexture = new Texture(Gdx.files.internal("data/wiredin.png"));

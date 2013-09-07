@@ -13,16 +13,16 @@ public class MainActivity extends AndroidApplication {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		DataBaseHelper dbh;
-		try {
-			dbh = new DataBaseHelper(this);
-			dbh.createdatabase();
-			dbh.opendatabase();
-			dbh.getReadableDatabase();
-		} catch (IOException e) {
+		//DataBaseHelper dbh;
+	//	try {
+		//	dbh = new DataBaseHelper(this);
+	//		dbh.createdatabase();
+		//	dbh.opendatabase();
+		//	dbh.getReadableDatabase();
+		//} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			//e.printStackTrace();
+	//	}
 		AndroidApplicationConfiguration cfg = new AndroidApplicationConfiguration();
 		cfg.useGL20 = false;
 

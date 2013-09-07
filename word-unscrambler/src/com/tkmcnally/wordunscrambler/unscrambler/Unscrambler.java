@@ -27,12 +27,12 @@ public class Unscrambler {
 	public static boolean loaded = true;
 	public static HashMap<String, List<String>> sm = new HashMap<String, List<String>>();
 	
-	public static SQLiteDatabase dbConnection;
+	public static Connection dbConnection;
 	
 	public static List<String> getAnagram(String anagram) throws SQLException {
 		
 		Statement statement = dbConnection.createStatement();
-		ResultSet rs = statement.executeQuery("SELECT originalword FROM " + anagram.charAt(0) + "words WHERE sortedword = '" + anagram + "'");
+		ResultSet rs = statement.executeQuery("SELECT originalword FROM " + anagram.charAt(0) + "words WHERE sortedword like '" + anagram + "'");
 
 	
 		
@@ -85,7 +85,7 @@ public class Unscrambler {
 					}
 				}
 			}
-			
+			System.out.println(returnList);
 		} catch (SQLException e) {
 			testing.add("Error!");
 			e.printStackTrace();

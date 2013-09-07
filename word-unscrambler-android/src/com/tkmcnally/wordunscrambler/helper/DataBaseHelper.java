@@ -16,7 +16,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	private Context mycontext;
 
 	private String DB_PATH = mycontext.getApplicationContext().getPackageName()+"/databases/";
-	private static String DB_NAME = "dictionarydb.db";//the extension may be .sqlite or .db
+	private static String DB_NAME = "dictionarydb";//the extension may be .sqlite or .db
 	public SQLiteDatabase myDataBase;
 	/*private String DB_PATH = "/data/data/"
                         + mycontext.getApplicationContext().getPackageName()
