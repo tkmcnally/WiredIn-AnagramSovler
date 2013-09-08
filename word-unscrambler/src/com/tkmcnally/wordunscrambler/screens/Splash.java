@@ -52,7 +52,7 @@ public class Splash implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		
-		if(update)
+		
 			tweenManager.update(Gdx.graphics.getDeltaTime());
 		
 		
@@ -81,8 +81,8 @@ public class Splash implements Screen {
 					
 					Timeline.createSequence()
 				
-					.push(Tween.to(logo, SpriteAccessor.POSITION, 3f).ease(Linear.INOUT).target(Gdx.graphics.getWidth() / 2 - logo.getWidth() / 3 , Gdx.graphics.getHeight() - Gdx.graphics.getHeight() / 3))
-					.push(Tween.to(logo, SpriteAccessor.POSITION, 1f).setCallback(cb).target(Gdx.graphics.getWidth() / 2 - logo.getWidth() / 3 ,(Gdx.graphics.getHeight() - Gdx.graphics.getHeight() / 3) + 15))
+					.push(Tween.to(logo, SpriteAccessor.POSITION, 2.8f).target(Gdx.graphics.getWidth() / 2 - logo.getWidth() / 3 , Gdx.graphics.getHeight() - Gdx.graphics.getHeight() / 3))
+					.push(Tween.to(logo, SpriteAccessor.POSITION, 0.3f).setCallback(cb2).target(Gdx.graphics.getWidth() / 2 - logo.getWidth() / 3 ,(Gdx.graphics.getHeight() - Gdx.graphics.getHeight() / 3) + 15))
 					
 					.start(tweenManager);
 					update = true;
@@ -119,7 +119,7 @@ public class Splash implements Screen {
 		logoTexture =  game.manager.get("data/wiredin.png");
 		logo = new Sprite(logoTexture);
 		logo.setPosition(Gdx.graphics.getWidth() / 2 - logo.getWidth() / 3 , Gdx.graphics.getHeight() + 900);
-		//createCallback();
+		createCallback();
 		
 		
 
@@ -166,10 +166,10 @@ public class Splash implements Screen {
 			public void onEvent(int type, BaseTween<?> source) {	
 				long start = System.currentTimeMillis();
 			
-				//game.setScreen(menu);
+				game.setScreen(menu);
 				long end = System.currentTimeMillis();
 				
-				System.out.println(end - start);
+				System.out.println("ASDADS" + (end - start));
 			}
 		};
 		

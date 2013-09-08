@@ -42,8 +42,6 @@ import com.tkmcnally.wordunscrambler.unscrambler.Unscrambler;
 
 public class MainMenu implements Screen {
 
-	private static final int MAX_RESULTS = 5;
-
 	private MyGdxGame game;
 	private SpriteBatch batch;
 	private Texture backgroundTexture;
@@ -53,14 +51,9 @@ public class MainMenu implements Screen {
 	private Stage stage;
 	private Table table;
 	private TweenManager tweenManager;
-	private float[] tfOrigPos;
-	private TextField[] newFields = new TextField[MAX_RESULTS];
 	private TweenCallback cb1;
-	private boolean shown = false;
 	
 	private HashMap<Integer, List<String>> unscrambledEntries;
-
-	private int RESULT_PAGE_NUM = 0;
 
 	private Skin skin;
 
@@ -76,7 +69,6 @@ public class MainMenu implements Screen {
 
 	// constructor to keep a reference to the main Game class
 	public MainMenu(MyGdxGame game){
-	
 		this.game = game;
 		skin = game.manager.get("data/uiskin.json");
 		scrambledLabel = new Label("Scrambled Word:", skin);
@@ -85,17 +77,7 @@ public class MainMenu implements Screen {
 		stage = new Stage();
 		Gdx.input.setInputProcessor(stage);		
 	}
-	
-	public void loadTextures() {
 		
-		
-		
-		//////////////////////////////////////////////
-		
-		
-
-	}
-	
 	public void loadFont() {
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/CALIBRI.TTF"));
 		font = generator.generateFont(72); 
@@ -124,23 +106,6 @@ public class MainMenu implements Screen {
 	public void hide() {
 		batch.dispose();
 
-	}
-
-	public boolean isMoreResults() {
-		//int fieldNum = unscrambled.size() - (MAX_RESULTS * (RESULT_PAGE_NUM + 1)) - 1;
-	//	if(fieldNum >= 1) {
-		//	return true;
-	//	}
-
-		return false;
-	}
-
-	public boolean isPrevResults() {
-		if(RESULT_PAGE_NUM != 0) {
-			return true;
-		}
-
-		return false;
 	}
 
 	@Override
@@ -190,7 +155,6 @@ public class MainMenu implements Screen {
 		//	table.add(output).pad(2, 0, 2, 0);
 		//	table.row();
 
-		tfOrigPos = new float[4];
 
 
 		//Row 3
@@ -237,7 +201,7 @@ public class MainMenu implements Screen {
 		ts.font = font1;
 		ts.background = skin.getDrawable("textfield");
 		ts.fontColor = Color.WHITE;
-		input = new TextField("", ts);
+		input = new TextField("", skin);
 		
 		backgroundTexture = game.manager.get("data/bg_1920-1080.png");
 		background = new Image(backgroundTexture);
@@ -255,10 +219,8 @@ public class MainMenu implements Screen {
 					while(iter.hasNext()) {
 						Integer index = iter.next();
 						count = count + unscrambledEntries.get(index).size();
-						//for(int i = 0; i < unscrambledEntries.get(index).size(); i++) {
-							
-						//}
 					}
+					
 					//Reset Table to original state.
 					resetTable();
 					
@@ -309,32 +271,18 @@ public class MainMenu implements Screen {
 		table = new Table();
 		stage.addActor(table);
 		table.top().pad(10, 0, 0, 0);
+		
 		//Row 1
 		table.add(scrambledLabel).pad(2, 0, 2, 10);
 		table.add(input).height(screen_W * 0.15f).width(screen_W * 0.7f).pad(2, 0, 2, 0);
 		table.row();
 
 		//Row 2
-		//	table.add(unscrambledLabel).pad(2, 10, 2, 10);
-		//	table.add(output).pad(2, 0, 2, 0);
-		//	table.row();
-
-		tfOrigPos = new float[4];
-
-	
-
-		//Row 3
 		table.add();
 		table.add(inputButton).height((float) (screen_H * 0.05)).width((float) (screen_W * 0.3)).pad(2, 0, 2, 0);
 		
-
-	
-
 		table.setFillParent(true);
 		//	table.debug(); // turn on all debug lines (table, cell, and widget)
 
-	
-
-		//	Sprite test = new Sprite(output);
 	}
 }
