@@ -9,10 +9,12 @@ import aurelienribon.tweenengine.Timeline;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
+import aurelienribon.tweenengine.equations.Linear;
 import aurelienribon.tweenengine.equations.Sine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.loaders.SkinLoader;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -21,6 +23,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.tkmcnally.wordunscrambler.MyGdxGame;
 import com.tkmcnally.wordunscrambler.sprites.SpriteAccessor;
 import com.tkmcnally.wordunscrambler.unscrambler.Unscrambler;
@@ -36,7 +39,7 @@ public class Splash implements Screen {
 	private Sprite background, logo;
 	private MainMenu menu;
 	private TweenCallback cb, cb2;
-	private boolean doneSplash = false;
+	private boolean doneSplash = false, dbLoaded = false, transitionStarted = false, screenUp = false, update = false;
 	
 	 public Splash(MyGdxGame game){
          this.game = game;
@@ -48,12 +51,10 @@ public class Splash implements Screen {
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-		tweenManager.update(delta);
 		
+		if(update)
+			tweenManager.update(Gdx.graphics.getDeltaTime());
 		
-		if(doneSplash == true && Unscrambler.loaded) {
-			Tween.to(logo, SpriteAccessor.ALPHA, 0.2f).setCallback(cb2).target(0).start(tweenManager);
-		}
 		
 		//DRAW STUFF
 		batch.begin();
@@ -63,7 +64,36 @@ public class Splash implements Screen {
 		
 		batch.end();
 		//END DRAWING STUFF
-	
+
+		
+			if(game.manager.update() && batch.totalRenderCalls > 2) {
+				if(!screenUp) {
+					Gdx.app.postRunnable(new Runnable() {
+				         @Override
+				         public void run() {
+				        	 loadMenu();
+
+				         }
+				      });
+				}
+				if(!dbLoaded) {
+					dbLoaded=true;
+					
+					Timeline.createSequence()
+				
+					.push(Tween.to(logo, SpriteAccessor.POSITION, 3f).ease(Linear.INOUT).target(Gdx.graphics.getWidth() / 2 - logo.getWidth() / 3 , Gdx.graphics.getHeight() - Gdx.graphics.getHeight() / 3))
+					.push(Tween.to(logo, SpriteAccessor.POSITION, 1f).setCallback(cb).target(Gdx.graphics.getWidth() / 2 - logo.getWidth() / 3 ,(Gdx.graphics.getHeight() - Gdx.graphics.getHeight() / 3) + 15))
+					
+					.start(tweenManager);
+					update = true;
+					
+				}
+				
+			}
+			
+			
+		
+		
 		
 	}
 
@@ -75,34 +105,28 @@ public class Splash implements Screen {
 
 	@Override
 	public void show() {
-		
+		game.manager.load("data/uiskin.json", Skin.class, new SkinLoader.SkinParameter("data/uiskin.atlas"));
+	    game.manager.load("data/bg_1920-1080.png", Texture.class);
+	    game.manager.load("data/wiredin.png", Texture.class);
+	    game.manager.finishLoading();
 		batch = new SpriteBatch();
 		tweenManager = new TweenManager(); 
 		Tween.registerAccessor(Sprite.class, new SpriteAccessor());
 		
-		backgroundTexture = new Texture(Gdx.files.internal("data/bg_1920-1080.png"));
+		backgroundTexture = game.manager.get("data/bg_1920-1080.png");
 		background = new Sprite(backgroundTexture);
 		
-		logoTexture = new Texture(Gdx.files.internal("data/wiredin.png"));
+		logoTexture =  game.manager.get("data/wiredin.png");
 		logo = new Sprite(logoTexture);
-		logo.setPosition(Gdx.graphics.getWidth() / 2 - logo.getWidth() / 3 , Gdx.graphics.getHeight());
-		createCallback();
-	//	Tween.set(logo, SpriteAccessor.POSITION).target(100, 100).start(tweenManager);
-		//Tween.to(logo, SpriteAccessor.POSITION, 1).delay(0.1f).target(Gdx.graphics.getWidth() / 2 - logo.getWidth() / 3 , Gdx.graphics.getHeight() - Gdx.graphics.getHeight() / 3).start(tweenManager);
-		Timeline.createSequence()
-			.push(Tween.to(logo, SpriteAccessor.POSITION, 0.8f).delay(0.5f).target(Gdx.graphics.getWidth() / 2 - logo.getWidth() / 3 , Gdx.graphics.getHeight() - Gdx.graphics.getHeight() / 3))
-			.push(Tween.to(logo, SpriteAccessor.POSITION, 0.3f).setCallback(cb).target(Gdx.graphics.getWidth() / 2 - logo.getWidth() / 3 ,(Gdx.graphics.getHeight() - Gdx.graphics.getHeight() / 3) + 15))
-			.start(tweenManager);
-		//	Tween.to(logo, SpriteAccessor.POSITION, 1).delay(0.1f).target(logo.getX(), logo.getY() + 10).start(tweenManager);
+		logo.setPosition(Gdx.graphics.getWidth() / 2 - logo.getWidth() / 3 , Gdx.graphics.getHeight() + 900);
+		//createCallback();
 		
-		new Thread(new Runnable() {
-		     public void run() {
-		         // Do something on the main thread
-		         //Unscrambler.setupMap();
-		         
-		     }
-		  }).start();
 		
+
+			      
+			      
+	    
+			 
 	}
 
 	@Override
@@ -134,19 +158,36 @@ public class Splash implements Screen {
 			@Override
 			public void onEvent(int type, BaseTween<?> source) {		
 					doneSplash = true;	
-				//menu = new MainMenu(game);
-				//game.setScreen(menu);
 			}
 		};
 		
 		cb2 = new TweenCallback() {
 			@Override
-			public void onEvent(int type, BaseTween<?> source) {		
-				menu = new MainMenu(game);
-				game.setScreen(menu);
+			public void onEvent(int type, BaseTween<?> source) {	
+				long start = System.currentTimeMillis();
+			
+				//game.setScreen(menu);
+				long end = System.currentTimeMillis();
+				
+				System.out.println(end - start);
 			}
 		};
 		
+	}
+	
+	public void loadMenu() {
+		screenUp = true;
+		long start = System.currentTimeMillis();
+
+	
+		menu = new MainMenu(game);
+		menu.loadFont();
+		long end = System.currentTimeMillis();
+		
+		System.out.println(end - start);
+		Unscrambler.dbConnection = game.mActionResolver.getConnection();
+	
+	
 	}
 
 }
