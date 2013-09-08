@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -39,7 +40,7 @@ public class MainMenu implements Screen {
 	private SpriteBatch batch;
 	private Texture backgroundTexture;
 	private Image background;
-	private BitmapFont font;
+	private BitmapFont font,font1;
 	private OrthographicCamera camera;
 	private Stage stage;
 	private Table table;
@@ -69,6 +70,7 @@ public class MainMenu implements Screen {
 		stage = new Stage();
 		Gdx.input.setInputProcessor(stage);
 		Unscrambler.dbConnection = game.mActionResolver.getConnection();
+		
 	}
 
 
@@ -220,7 +222,14 @@ public class MainMenu implements Screen {
 
 
 		batch = new SpriteBatch();
-		font = new BitmapFont();
+		
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/CALIBRI.TTF"));
+		//font12 = generator.generateFont(12); // font size 12 pixels
+		font = generator.generateFont(72); // font size 25 pixels
+		generator.dispose(); // don't forget to dispose to avoid memory leaks
+		
+		//font = new BitmapFont();
+		//font1 = new BitmapFont();
 
 		backgroundTexture = new Texture(Gdx.files.internal("data/bg_1920-1080.png"));
 		background = new Image(backgroundTexture);
@@ -249,6 +258,7 @@ public class MainMenu implements Screen {
 						Integer index = iter.next();
 						for(int i = 0; i < unscrambledEntries.get(index).size(); i++) {
 							label[i] = new Label(unscrambledEntries.get(index).get(i), skin);
+							label[i].scale(5);
 							//System.out.println(unscrambledEntries.get(index).get(i));
 							scrollTable.add(label[i]);
 						    scrollTable.row();
@@ -257,7 +267,7 @@ public class MainMenu implements Screen {
 					}
 					ScrollPane scrollPane = new ScrollPane(scrollTable, skin);
 					table.row();
-					table.add(scrollPane).size(100, 100);
+					table.add(scrollPane).width((float) (Gdx.graphics.getWidth() * 0.8)).height((float) (Gdx.graphics.getHeight() * 0.5));
 				
 					
 					
@@ -451,10 +461,11 @@ public class MainMenu implements Screen {
 
 		tfOrigPos = new float[4];
 
+	
 
 		//Row 3
 		table.add();
-		table.add(inputButton).pad(2, 0, 2, 0);
+		table.add(inputButton).height((float) (Gdx.graphics.getHeight() * 0.05)).width((float) (Gdx.graphics.getWidth() * 0.3)).pad(2, 0, 2, 0);
 		
 
 	
