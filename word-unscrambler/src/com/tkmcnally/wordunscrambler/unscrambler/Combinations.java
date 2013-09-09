@@ -9,6 +9,7 @@ import java.util.Set;
 public class Combinations {
 
 	public static List<String> getCombinations(final String word) {
+
 		List<String> wordList = new ArrayList<String>();
 		boolean first = true;
 

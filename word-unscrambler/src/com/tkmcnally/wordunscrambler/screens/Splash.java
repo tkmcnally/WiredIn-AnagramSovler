@@ -51,10 +51,7 @@ public class Splash implements Screen {
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-		
-		
-			tweenManager.update(Gdx.graphics.getDeltaTime());
-		
+		tweenManager.update(Gdx.graphics.getDeltaTime());
 		
 		//DRAW STUFF
 		batch.begin();
@@ -65,42 +62,26 @@ public class Splash implements Screen {
 		batch.end();
 		//END DRAWING STUFF
 
-		
-			if(game.manager.update() && batch.totalRenderCalls > 2) {
-				if(!screenUp) {
-					Gdx.app.postRunnable(new Runnable() {
-				         @Override
-				         public void run() {
-				        	 loadMenu();
+		if(game.manager.update() && batch.totalRenderCalls > 2) {
+			if(!screenUp) {
+				Gdx.app.postRunnable(new Runnable() {
+			         @Override
+			         public void run() {
+			        	 loadMenu();
 
-				         }
-				      });
-				}
-				if(!dbLoaded) {
-					dbLoaded=true;
-					
-					Timeline.createSequence()
-				
-					.push(Tween.to(logo, SpriteAccessor.POSITION, 2.8f).target(Gdx.graphics.getWidth() / 2 - logo.getWidth() / 3 , Gdx.graphics.getHeight() - Gdx.graphics.getHeight() / 3))
-					.push(Tween.to(logo, SpriteAccessor.POSITION, 0.3f).setCallback(cb2).target(Gdx.graphics.getWidth() / 2 - logo.getWidth() / 3 ,(Gdx.graphics.getHeight() - Gdx.graphics.getHeight() / 3) + 15))
-					
-					.start(tweenManager);
-					update = true;
-					
-				}
-				
+			         }
+			      });
 			}
-			
-			
-		
-		
-		
-	}
-
-	@Override
-	public void resize(int width, int height) {
-		
-		
+			if(!dbLoaded) {
+				dbLoaded=true;
+				
+				Timeline.createSequence()		
+				.push(Tween.to(logo, SpriteAccessor.POSITION, 2.8f).target(Gdx.graphics.getWidth() / 2 - logo.getWidth() / 3 , Gdx.graphics.getHeight() - Gdx.graphics.getHeight() / 3))
+				.push(Tween.to(logo, SpriteAccessor.POSITION, 0.3f).setCallback(cb2).target(Gdx.graphics.getWidth() / 2 - logo.getWidth() / 3 ,(Gdx.graphics.getHeight() - Gdx.graphics.getHeight() / 3) + 15))
+				.start(tweenManager);
+				update = true;		
+			}				
+		}
 	}
 
 	@Override
@@ -119,40 +100,10 @@ public class Splash implements Screen {
 		logoTexture =  game.manager.get("data/wiredin.png");
 		logo = new Sprite(logoTexture);
 		logo.setPosition(Gdx.graphics.getWidth() / 2 - logo.getWidth() / 3 , Gdx.graphics.getHeight() + 900);
-		createCallback();
-		
-		
-
-			      
-			      
-	    
-			 
+		createCallback();		 
 	}
 
-	@Override
-	public void hide() {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void pause() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void resume() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	public void createCallback() {
 		cb = new TweenCallback() {
 			@Override
@@ -178,8 +129,6 @@ public class Splash implements Screen {
 	public void loadMenu() {
 		screenUp = true;
 		long start = System.currentTimeMillis();
-
-	
 		menu = new MainMenu(game);
 		menu.loadFont();
 		long end = System.currentTimeMillis();
@@ -188,6 +137,36 @@ public class Splash implements Screen {
 		Unscrambler.dbConnection = game.mActionResolver.getConnection();
 	
 	
+	}
+
+	@Override
+	public void hide() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void pause() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void resume() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void resize(int width, int height) {
+		
+		
 	}
 
 }

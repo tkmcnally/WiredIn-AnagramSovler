@@ -2,9 +2,12 @@ package com.tkmcnally.wordunscrambler.screens;
 
 import java.awt.Font;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
 
 import sun.font.TrueTypeFont;
 import aurelienribon.tweenengine.BaseTween;
@@ -13,6 +16,8 @@ import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.SkinLoader;
@@ -33,6 +38,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane.ScrollPaneStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -46,7 +52,7 @@ public class MainMenu implements Screen {
 	private SpriteBatch batch;
 	private Texture backgroundTexture;
 	private Image background;
-	private BitmapFont font,font1;
+	private BitmapFont font_60,font_48;
 	private OrthographicCamera camera;
 	private Stage stage;
 	private Table table;
@@ -71,17 +77,35 @@ public class MainMenu implements Screen {
 	public MainMenu(MyGdxGame game){
 		this.game = game;
 		skin = game.manager.get("data/uiskin.json");
-		scrambledLabel = new Label("Scrambled Word:", skin);
+		
 		unscrambledLabel = new Label("Unscrambled Word:", skin);
-		inputButton = new TextButton("Unscramble!", skin);
-		stage = new Stage();
-		Gdx.input.setInputProcessor(stage);		
+		
+
+			
+	}
+	
+	@Override
+	public void render(float delta) {
+		Gdx.gl.glClearColor(1, 1, 1, 1);
+		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		tweenManager.update(delta);
+		
+		//DRAW STUFF
+		batch.begin();
+		
+		stage.act();
+		stage.draw();
+		Table.drawDebug(stage);
+		
+		//END DRAWING STUFF
+		batch.end();
+
 	}
 		
 	public void loadFont() {
-		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/CALIBRI.TTF"));
-		font = generator.generateFont(72); 
-		font1 = generator.generateFont(60);// font size 25 pixels
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/CALIBRI.TTF"));	
+		font_60 = generator.generateFont(60);// font size 25 pixels
+		font_48 = generator.generateFont(48); 
 		generator.dispose();
 	}
 
@@ -93,47 +117,6 @@ public class MainMenu implements Screen {
 			
 			}
 		};
-
-	}
-
-	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void hide() {
-		batch.dispose();
-
-	}
-
-	@Override
-	public void pause() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void render(float delta) {
-		Gdx.gl.glClearColor(1, 1, 1, 1);
-		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-		tweenManager.update(delta);
-
-		//	camera.update();
-		//	batch.setProjectionMatrix(camera.combined);
-
-		batch.begin();
-		//DRAW STUFF
-
-		//font.draw(batch,Unscrambler.unscramble(),  screen_W / 2,  screen_H / 2);
-		//background.draw(batch);
-		stage.act();
-		stage.draw();
-		Table.drawDebug(stage);
-		
-		//END DRAWING STUFF
-		batch.end();
 
 	}
 
@@ -151,13 +134,6 @@ public class MainMenu implements Screen {
 		table.row();
 
 		//Row 2
-		//	table.add(unscrambledLabel).pad(2, 10, 2, 10);
-		//	table.add(output).pad(2, 0, 2, 0);
-		//	table.row();
-
-
-
-		//Row 3
 		table.add();
 		table.add(inputButton).height((float) (screen_H * 0.05)).width((float) (screen_W * 0.3)).pad(2, 0, 2, 0);
 
@@ -166,60 +142,48 @@ public class MainMenu implements Screen {
 	}
 
 	@Override
-	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void resume() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void show() {
-		
-		
+		stage = new Stage();
+		Gdx.input.setInputProcessor(stage);	
 		tweenManager = new TweenManager();
 		Tween.registerAccessor(TextField.class, new TextFieldAccessor());
 
 		camera = new OrthographicCamera(screen_W, screen_H);
 		camera.setToOrtho(false, screen_W, screen_H);
 
-
-
 		batch = new SpriteBatch();
 		
-		
-		//font12 = generator.generateFont(12); // font size 12 pixels
-		 // don't forget to dispose to avoid memory leaks
-		
-		//font = new BitmapFont();
-		//font1 = new BitmapFont();
-		TextFieldStyle ts = new TextFieldStyle();
-		ts.font = font1;
-		ts.background = skin.getDrawable("textfield");
-		ts.fontColor = Color.WHITE;
-		input = new TextField("", skin);
+		TextFieldStyle textFieldStyle1 = new TextFieldStyle();
+		textFieldStyle1.font = font_60;
+		textFieldStyle1.background = skin.getDrawable("textfield");
+		textFieldStyle1.fontColor = Color.WHITE;
+		input = new TextField("", textFieldStyle1);
 		
 		backgroundTexture = game.manager.get("data/bg_1920-1080.png");
 		background = new Image(backgroundTexture);
 
+		TextButtonStyle textButtonStyle1 = skin.get(TextButtonStyle.class);
+		textButtonStyle1.font = font_48;
 
+		inputButton = new TextButton("Unscramble!", textButtonStyle1);
 		inputButton.addListener( new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				
 				try {
+
 					unscrambledEntries = Unscrambler.unscrambleWord(game, input.getText().trim());
 					Iterator<Integer> iter = unscrambledEntries.keySet().iterator();
 					final Table scrollTable = new Table();
-					int count = 0;
+					int count = 0, num_lengths = 0;
+					List<Integer> keys = new ArrayList<Integer>();
+					
 					while(iter.hasNext()) {
-						Integer index = iter.next();
-						count = count + unscrambledEntries.get(index).size();
+						int next_num = iter.next();
+						keys.add(next_num);
+						count = count + unscrambledEntries.get(next_num).size() + 1;
 					}
+					Collections.sort(keys);
 					
 					//Reset Table to original state.
 					resetTable();
@@ -232,22 +196,24 @@ public class MainMenu implements Screen {
 					
 					//Create style for Label (Font, Color etc...)
 					LabelStyle lts = new LabelStyle();
-					lts.font = font;
-					
+					lts.font = font_60;
+					int labelCount = 0;
 					//Populate labels with solved words and add to new ScrollTable.
-					while(iter.hasNext()) {
-						Integer index = iter.next();
-						for(int i = 0; i < unscrambledEntries.get(index).size(); i++) {
-							label[i] = new Label(unscrambledEntries.get(index).get(i), lts);
-							label[i].scale(5);
-							scrollTable.add(label[i]);
+					for(int i = 0; i < keys.size(); i++) {			
+						Integer index = keys.get(i);
+						label[labelCount] = new Label(index + "-------", lts);
+						scrollTable.add(label[labelCount]);
+						labelCount++;
+					    scrollTable.row();
+						for(int k = 0; k < unscrambledEntries.get(index).size(); k++) {
+							label[labelCount] = new Label(unscrambledEntries.get(index).get(k), lts);
+							label[labelCount].scale(5);
+							scrollTable.add(label[labelCount]);
+							labelCount++;
 						    scrollTable.row();
 							
 						}
 					}
-					
-					
-					resetTable();
 					
 					//Add scrollPane to main Table.
 					ScrollPaneStyle sps = skin.get(ScrollPaneStyle.class);
@@ -272,7 +238,13 @@ public class MainMenu implements Screen {
 		stage.addActor(table);
 		table.top().pad(10, 0, 0, 0);
 		
+		
 		//Row 1
+		LabelStyle labelStyle1 = new LabelStyle();
+		labelStyle1.font = font_48;
+		labelStyle1.fontColor = Color.WHITE;
+		scrambledLabel = new Label("Scrambled \n    Word:", labelStyle1);
+		
 		table.add(scrambledLabel).pad(2, 0, 2, 10);
 		table.add(input).height(screen_W * 0.15f).width(screen_W * 0.7f).pad(2, 0, 2, 0);
 		table.row();
@@ -283,6 +255,37 @@ public class MainMenu implements Screen {
 		
 		table.setFillParent(true);
 		//	table.debug(); // turn on all debug lines (table, cell, and widget)
+
+	}
+	
+	@Override
+	public void resize(int width, int height) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void resume() {
+		// TODO Auto-generated method stub
+
+	}
+
+
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void hide() {
+		batch.dispose();
+
+	}
+
+	@Override
+	public void pause() {
+		// TODO Auto-generated method stub
 
 	}
 }

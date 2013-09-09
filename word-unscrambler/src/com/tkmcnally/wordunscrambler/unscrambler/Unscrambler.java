@@ -18,8 +18,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.sql.rowset.CachedRowSet;
+
 import com.badlogic.gdx.Gdx;
+import com.sun.rowset.CachedRowSetImpl;
 import com.tkmcnally.wordunscrambler.MyGdxGame;
+import com.tkmcnally.wordunscrambler.screens.MainMenu;
 
 public class Unscrambler {
 
@@ -31,23 +35,24 @@ public class Unscrambler {
 	
 	public static List<String> getAnagram(String anagram) throws SQLException {
 		
+		
 		Statement statement = dbConnection.createStatement();
+		statement.setFetchSize(10);
+		statement.setPoolable(true);
 		ResultSet rs = statement.executeQuery("SELECT originalword FROM " + anagram.charAt(0) + "words WHERE sortedword like '" + anagram + "'");
-
-	
+		
 		
 		List<String> returnList = new ArrayList<String>();
-		while(rs.next()) {
-			//System.out.println( anagram + " # " + rs.getString(1));
-			returnList.add(rs.getString("originalword"));
-		}
-		returnList = stripList(returnList);
-		//List<String> test = map.get(anagram);
-		//if(test != null) {
-		//	returnList.addAll(test);
-			
-		//}
+		long start = System.currentTimeMillis();
 		
+		while(rs.next()) {
+			returnList.add(rs.getString(1));
+		}
+		rs.close();
+		long end = System.currentTimeMillis();
+		System.out.println(end - start);
+		returnList = stripList(returnList);
+
 		return returnList;
 	}
 
@@ -72,11 +77,19 @@ public class Unscrambler {
 		
 		List<String> testing = new ArrayList<String>();
 		List<String> combinations = Combinations.getCombinations(scrambled);
+		
+		
 		HashMap<Integer, List<String>> returnList = new HashMap<Integer, List<String>>();
 		try {
 			for(int i = 0; i < combinations.size(); i++) {
 				testing = new ArrayList<String>();
+				long start = System.currentTimeMillis();
+				
 				testing.addAll(getAnagram(combinations.get(i)));
+				
+				long end = System.currentTimeMillis();
+				System.out.println("Here: " + (end - start));
+				
 				if(testing.size() > 0) {
 					if(returnList.get(combinations.get(i).length()) == null) {
 						returnList.put(combinations.get(i).length(), testing);
@@ -148,69 +161,9 @@ public class Unscrambler {
 		long total = endtime - starttime;
 		
 		System.out.println("Total: " + total);
-		loaded = true;
-		
-		
+		loaded = true;	
 	}
-	
-	/*public static void setupMap() {
-		long starttime = System.nanoTime();
-		HashMap<String, List<String>> map = new HashMap<String, List<String>>();
-//		System.out.println(Gdx.files.internal("data/testlist.txt").readString());
-	//	File file = new File(Gdx.files.internal("data/testlist.txt").path());
-	//	FileInputStream fis = null;
 
-	
-		BufferedReader br = Gdx.files.internal("data/TWL06.txt").reader(512);
-		// The name of the file to open.
-	
-
-		try {
-		
-			String line;
-			String key;
-			String valueLine;
-			String value = null;
-			int markerOne = 0;
-			List<String> list;
-			HashMap<String, List<String>> iMap = new HashMap<String, List<String>>();
-			while((line = br.readLine()) != null) {
-			
-				key = sort(line);	
-				
-	 			
-	 			
-				
-				List<String> iList;
-			
-					iList = iMap.get(key);
-					
-					if(iList == null) {
-						list = new ArrayList<String>();
-						list.add(value);
-						iMap.put(key, list);
-					} else {
-						iMap.get(key).add(line);
-					}
-				
-							
-				
-			}
-			br.close();
-			Unscrambler.map = iMap;
-		} catch(Exception e) {
-			
-		}
-		
-		long endtime = System.nanoTime();
-		long total = endtime - starttime;
-		
-		System.out.println("Total: " + total);
-		loaded = true;
-		
-		
-	}*/
-	
 	public static String sort(String s) {
 		char[] c = s.toCharArray();
 		
@@ -218,27 +171,4 @@ public class Unscrambler {
 		String string = new String(c);
 		return string;
 	}
-	
-	/*
-	public static void main(String[] args){
-		  Runtime runtime = Runtime.getRuntime();
-		    // Run the garbage collector
-		    runtime.gc();
-		    long MEGABYTE = 1024L * 1024L;    
-		long memory = runtime.totalMemory() - runtime.freeMemory();
-		
-	    System.out.println("Used memory is bytes: " + memory);
-	    
-		setupMap();
-		long starttime = System.nanoTime();
-		//System.out.println(map.get(6));
-		//System.out.println(map.get(6).get("BELOTT"));
-		long endtime = System.nanoTime();
-		long total = endtime - starttime;
-		System.out.println("Total: " + total);
-		memory = runtime.totalMemory() - runtime.freeMemory();
-	    System.out.println("Used memory is bytes: " + memory / MEGABYTE);
-		
-		
-	}*/
 }
