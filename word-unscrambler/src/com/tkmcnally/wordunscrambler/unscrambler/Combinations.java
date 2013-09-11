@@ -13,11 +13,6 @@ public class Combinations {
 		List<String> wordList = new ArrayList<String>();
 		boolean first = true;
 
-	/*	Set<Character> set = new HashSet<Character>();
-		for(int i = 0; i < word.length(); i++) {
-			set.add(Character.valueOf(word.charAt(i)));
-		}*/
-		
 		Set<Integer> set = new HashSet<Integer>();
 		for(int i = 0; i < word.length(); i++) {
 			set.add(i);
@@ -40,9 +35,7 @@ public class Combinations {
 				}
 			}
 			first = false;
-
 		}
-
 		return wordList;
 	}
 

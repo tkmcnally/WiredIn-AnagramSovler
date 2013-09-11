@@ -20,7 +20,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	private static Context mycontext;
 
 	private String DB_PATH = "/data/data/com.tkmcnally.wordunscrambler/databases/";
-	private static String DB_NAME = "dictionarydb.db";//the extension may be .sqlite or .db
+	private static String DB_NAME = "dictionary.db";//the extension may be .sqlite or .db
 	public SQLiteDatabase myDataBase;
 	private Resources resources;
 	
@@ -61,50 +61,65 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	    byte[] buffer = new byte[1024];
 	    int length;
 
-	    databaseInput = resources.openRawResource(R.raw.db1pack);
+	    databaseInput = resources.openRawResource(R.raw.testing1);
 	    while((length = databaseInput.read(buffer)) > 0) {
 	        databaseOutput.write(buffer, 0, length);
 	        databaseOutput.flush();
 	    }
-	    databaseInput.close();
+	    //databaseInput.close();
 
-	    databaseInput = resources.openRawResource(R.raw.db2pack);
+	    databaseInput = resources.openRawResource(R.raw.testing2);
 	    while((length = databaseInput.read(buffer)) > 0) {
 	        databaseOutput.write(buffer);
 	        databaseOutput.flush();
 	    }
-	    databaseInput = resources.openRawResource(R.raw.db3pack);
+	  //  databaseInput.close();
+	    databaseInput = resources.openRawResource(R.raw.testing3);
 	    while((length = databaseInput.read(buffer)) > 0) {
 	        databaseOutput.write(buffer, 0, length);
 	        databaseOutput.flush();
 	    }
-	    databaseInput.close();
+	//    databaseInput.close();
 
-	    databaseInput = resources.openRawResource(R.raw.db4pack);
+	    databaseInput = resources.openRawResource(R.raw.testing4);
 	    while((length = databaseInput.read(buffer)) > 0) {
 	        databaseOutput.write(buffer);
 	        databaseOutput.flush();
 	    }
-	    databaseInput = resources.openRawResource(R.raw.db5pack);
+	  //  databaseInput.close();
+	    databaseInput = resources.openRawResource(R.raw.testing5);
 	    while((length = databaseInput.read(buffer)) > 0) {
 	        databaseOutput.write(buffer, 0, length);
 	        databaseOutput.flush();
 	    }
-	    databaseInput.close();
+	   // databaseInput.close();
 
-	    databaseInput = resources.openRawResource(R.raw.db6pack);
+	    databaseInput = resources.openRawResource(R.raw.testing6);
 	    while((length = databaseInput.read(buffer)) > 0) {
 	        databaseOutput.write(buffer);
 	        databaseOutput.flush();
 	    }
-	    databaseInput = resources.openRawResource(R.raw.db7pack);
+	 //   databaseInput.close();
+	    databaseInput = resources.openRawResource(R.raw.testing7);
 	    while((length = databaseInput.read(buffer)) > 0) {
 	        databaseOutput.write(buffer, 0, length);
 	        databaseOutput.flush();
 	    }
-	    databaseInput.close();
+	 //   databaseInput.close();
 
-	    databaseInput = resources.openRawResource(R.raw.db8pack);
+	    databaseInput = resources.openRawResource(R.raw.testing8);
+	    while((length = databaseInput.read(buffer)) > 0) {
+	        databaseOutput.write(buffer);
+	        databaseOutput.flush();
+	    }
+	    
+	    databaseInput = resources.openRawResource(R.raw.testing9);
+	    while((length = databaseInput.read(buffer)) > 0) {
+	        databaseOutput.write(buffer);
+	        databaseOutput.flush();
+	    }
+	    
+	    databaseInput = resources.openRawResource(R.raw.testing10);
 	    while((length = databaseInput.read(buffer)) > 0) {
 	        databaseOutput.write(buffer);
 	        databaseOutput.flush();

@@ -22,7 +22,7 @@ public class AndroidActionResolver implements ActionResolver {
 
 	@Override
 	public Connection getConnection() {
-		String url = "jdbc:sqldroid:/data/data/com.tkmcnally.wordunscrambler/databases/dictionarydb.db";
+		String url = "jdbc:sqldroid:/data/data/com.tkmcnally.wordunscrambler/databases/dictionary.db";
 		try {
 			Class.forName("org.sqldroid.SQLDroidDriver").newInstance();
 			return DriverManager.getConnection(url);

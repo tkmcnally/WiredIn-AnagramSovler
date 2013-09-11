@@ -59,7 +59,8 @@ public class MainMenu implements Screen {
 	private TweenManager tweenManager;
 	private TweenCallback cb1;
 	
-	private HashMap<Integer, List<String>> unscrambledEntries;
+	private HashMap<Integer, List<String>> unscrambledEntries = new HashMap<Integer, List<String>>();
+	private HashMap<Integer, List<String>> unscrambledEntriesOLD = new HashMap<Integer, List<String>>();
 
 	private Skin skin;
 
@@ -72,16 +73,12 @@ public class MainMenu implements Screen {
 	private int screen_H = Gdx.graphics.getHeight();
 	private int screen_W = Gdx.graphics.getWidth();
 
-
+	private volatile Thread unscrambleThread;
 	// constructor to keep a reference to the main Game class
 	public MainMenu(MyGdxGame game){
 		this.game = game;
 		skin = game.manager.get("data/uiskin.json");
-		
-		unscrambledLabel = new Label("Unscrambled Word:", skin);
-		
-
-			
+		unscrambledLabel = new Label("Unscrambled Word:", skin);	
 	}
 	
 	@Override
@@ -93,6 +90,11 @@ public class MainMenu implements Screen {
 		//DRAW STUFF
 		batch.begin();
 		
+		if(resultsChanged()) {
+			unscrambledEntriesOLD.clear();
+			unscrambledEntriesOLD.putAll(unscrambledEntries);
+			redrawResults();
+		}
 		stage.act();
 		stage.draw();
 		Table.drawDebug(stage);
@@ -100,6 +102,66 @@ public class MainMenu implements Screen {
 		//END DRAWING STUFF
 		batch.end();
 
+	}
+	
+	public void redrawResults() {
+		Iterator<Integer> iter = unscrambledEntries.keySet().iterator();
+		final Table scrollTable = new Table();
+		int count = 0, num_lengths = 0;
+		List<Integer> keys = new ArrayList<Integer>();
+		
+		while(iter.hasNext()) {
+			int next_num = iter.next();
+			keys.add(next_num);
+		//	count = count + unscrambledEntries.get(next_num).size() + 1;
+		}
+		count = 10000;
+		Collections.sort(keys);
+		
+		//Reset Table to original state.
+		resetTable();
+		
+		//Create labels for all solved words.
+		Label[] label = new Label[count];
+		
+		//Create iterator for solved entries.
+		iter = unscrambledEntries.keySet().iterator();
+		
+		//Create style for Label (Font, Color etc...)
+		LabelStyle lts = new LabelStyle();
+		lts.font = font_60;
+		int labelCount = 0;
+		//Populate labels with solved words and add to new ScrollTable.
+		for(int i = 0; i < keys.size(); i++) {			
+			Integer index = keys.get(i);
+			label[labelCount] = new Label(index + "-------", lts);
+			scrollTable.add(label[labelCount]);
+			labelCount++;
+		    scrollTable.row();
+			for(int k = 0; k < unscrambledEntries.get(index).size(); k++) {
+				label[labelCount] = new Label(unscrambledEntries.get(index).get(k), lts);
+				label[labelCount].scale(5);
+				scrollTable.add(label[labelCount]);
+				labelCount++;
+			    scrollTable.row();
+				
+			}
+		}
+		
+		//Add scrollPane to main Table.
+		ScrollPaneStyle sps = skin.get(ScrollPaneStyle.class);
+		sps.background = null;
+		ScrollPane scrollPane = new ScrollPane(scrollTable, sps);
+		table.row();
+		table.add(scrollPane).width((float) (screen_W * 0.8)).height((float) (screen_H * 0.5)).colspan(2);
+		table.debug();
+	}
+	
+	public boolean resultsChanged() {
+		if(!unscrambledEntriesOLD.equals(unscrambledEntries)) {
+			return true;
+		}	
+		return false;
 	}
 		
 	public void loadFont() {
@@ -113,11 +175,9 @@ public class MainMenu implements Screen {
 
 		cb1 = new TweenCallback() {
 			@Override
-			public void onEvent(int type, BaseTween<?> source) {
-			
+			public void onEvent(int type, BaseTween<?> source) {		
 			}
 		};
-
 	}
 
 	public void resetTable() {
@@ -167,71 +227,28 @@ public class MainMenu implements Screen {
 
 		inputButton = new TextButton("Unscramble!", textButtonStyle1);
 		inputButton.addListener( new ChangeListener() {
+			
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				
-				try {
-
-					unscrambledEntries = Unscrambler.unscrambleWord(game, input.getText().trim());
-					Iterator<Integer> iter = unscrambledEntries.keySet().iterator();
-					final Table scrollTable = new Table();
-					int count = 0, num_lengths = 0;
-					List<Integer> keys = new ArrayList<Integer>();
-					
-					while(iter.hasNext()) {
-						int next_num = iter.next();
-						keys.add(next_num);
-						count = count + unscrambledEntries.get(next_num).size() + 1;
+			unscrambledEntries.clear();
+		
+			unscrambleThread = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						unscrambledEntries.clear();
+						
+						Unscrambler.unscrambleWord(game, input.getText().trim(), unscrambledEntries);
+						
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
-					Collections.sort(keys);
-					
-					//Reset Table to original state.
-					resetTable();
-					
-					//Create labels for all solved words.
-					Label[] label = new Label[count];
-					
-					//Create iterator for solved entries.
-					iter = unscrambledEntries.keySet().iterator();
-					
-					//Create style for Label (Font, Color etc...)
-					LabelStyle lts = new LabelStyle();
-					lts.font = font_60;
-					int labelCount = 0;
-					//Populate labels with solved words and add to new ScrollTable.
-					for(int i = 0; i < keys.size(); i++) {			
-						Integer index = keys.get(i);
-						label[labelCount] = new Label(index + "-------", lts);
-						scrollTable.add(label[labelCount]);
-						labelCount++;
-					    scrollTable.row();
-						for(int k = 0; k < unscrambledEntries.get(index).size(); k++) {
-							label[labelCount] = new Label(unscrambledEntries.get(index).get(k), lts);
-							label[labelCount].scale(5);
-							scrollTable.add(label[labelCount]);
-							labelCount++;
-						    scrollTable.row();
-							
-						}
-					}
-					
-					//Add scrollPane to main Table.
-					ScrollPaneStyle sps = skin.get(ScrollPaneStyle.class);
-					sps.background = null;
-					ScrollPane scrollPane = new ScrollPane(scrollTable, sps);
-					table.row();
-					table.add(scrollPane).width((float) (screen_W * 0.8)).height((float) (screen_H * 0.5)).colspan(2);
-					table.debug();
-					
-					
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
 				
+			});
+			unscrambleThread.start();
 			}
 		});
-		//stage.setCamera(camera);
 		stage.addActor(background);
 
 		table = new Table();
@@ -256,6 +273,10 @@ public class MainMenu implements Screen {
 		table.setFillParent(true);
 		//	table.debug(); // turn on all debug lines (table, cell, and widget)
 
+	}
+	
+	public void stopThread() {
+		unscrambleThread = null;
 	}
 	
 	@Override
