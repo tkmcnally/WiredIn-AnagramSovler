@@ -43,6 +43,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.tkmcnally.wordunscrambler.MyGdxGame;
+import com.tkmcnally.wordunscrambler.Util;
 import com.tkmcnally.wordunscrambler.sprites.TextFieldAccessor;
 import com.tkmcnally.wordunscrambler.unscrambler.Unscrambler;
 
@@ -134,14 +135,15 @@ public class MainMenu implements Screen {
 		//Populate labels with solved words and add to new ScrollTable.
 		for(int i = 0; i < keys.size(); i++) {			
 			Integer index = keys.get(i);
-			label[labelCount] = new Label(index + "-------", lts);
+			label[labelCount] = new Label(index + " Letter Words", lts);
 			scrollTable.add(label[labelCount]);
 			labelCount++;
 		    scrollTable.row();
+		    lts.background = input.getStyle().background;
 			for(int k = 0; k < unscrambledEntries.get(index).size(); k++) {
 				label[labelCount] = new Label(unscrambledEntries.get(index).get(k), lts);
 				label[labelCount].scale(5);
-				scrollTable.add(label[labelCount]);
+				scrollTable.add(label[labelCount]).width(screen_W);
 				labelCount++;
 			    scrollTable.row();
 				
@@ -151,9 +153,10 @@ public class MainMenu implements Screen {
 		//Add scrollPane to main Table.
 		ScrollPaneStyle sps = skin.get(ScrollPaneStyle.class);
 		sps.background = null;
+		
 		ScrollPane scrollPane = new ScrollPane(scrollTable, sps);
 		table.row();
-		table.add(scrollPane).width((float) (screen_W * 0.8)).height((float) (screen_H * 0.5)).colspan(2);
+		table.add(scrollPane).width(screen_W).height(screen_H * 0.6f).colspan(2);
 		table.debug();
 	}
 	
@@ -188,14 +191,10 @@ public class MainMenu implements Screen {
 		stage.addActor(background);
 		stage.addActor(table);
 
-		//Row 1
-		table.add(scrambledLabel).right().pad(2, 0, 2, 10);
-		table.add(input).height(screen_W * 0.15f).width(screen_W * 0.7f).pad(2, 0, 2, 0);
+		//Row 
+		table.add(input).height(screen_H * 0.10f).width(screen_W * 0.8f).pad(2, 0, 2, 0);
+		table.add(inputButton).height(screen_H * 0.10f).width(screen_W * 0.2f).pad(2, 0, 2, 0);
 		table.row();
-
-		//Row 2
-		table.add();
-		table.add(inputButton).height((float) (screen_H * 0.05)).width((float) (screen_W * 0.3)).pad(2, 0, 2, 0);
 
 		table.setFillParent(true);
 		table.debug(); // turn on all debug lines (table, cell, and widget)
@@ -219,13 +218,14 @@ public class MainMenu implements Screen {
 		textFieldStyle1.fontColor = Color.WHITE;
 		input = new TextField("", textFieldStyle1);
 		
-		backgroundTexture = game.manager.get("data/bg_1920-1080.png");
+		
+		backgroundTexture = game.manager.get("data/bg_1920-10801.png");
 		background = new Image(backgroundTexture);
 
 		TextButtonStyle textButtonStyle1 = skin.get(TextButtonStyle.class);
 		textButtonStyle1.font = font_48;
 
-		inputButton = new TextButton("Unscramble!", textButtonStyle1);
+		inputButton = new TextButton("O", textButtonStyle1);
 		inputButton.addListener( new ChangeListener() {
 			
 			@Override
@@ -237,8 +237,8 @@ public class MainMenu implements Screen {
 				public void run() {
 					try {
 						unscrambledEntries.clear();
-						
-						Unscrambler.unscrambleWord(game, input.getText().trim(), unscrambledEntries);
+						String userInput = input.getText().trim();
+						Unscrambler.unscrambleWord(game, Util.filterString(userInput), unscrambledEntries);
 						
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -260,15 +260,16 @@ public class MainMenu implements Screen {
 		LabelStyle labelStyle1 = new LabelStyle();
 		labelStyle1.font = font_48;
 		labelStyle1.fontColor = Color.WHITE;
-		scrambledLabel = new Label("Scrambled \n    Word:", labelStyle1);
+		//scrambledLabel = new Label("Scrambled \n    Word:", labelStyle1);
 		
-		table.add(scrambledLabel).pad(2, 0, 2, 10);
-		table.add(input).height(screen_W * 0.15f).width(screen_W * 0.7f).pad(2, 0, 2, 0);
+	//	table.add(scrambledLabel).pad(2, 0, 2, 10);
+		table.add(input).height(screen_H * 0.10f).width(screen_W * 0.8f).pad(2, 0, 2, 0);
+		table.add(inputButton).height(screen_H * 0.10f).width(screen_W * 0.2f).pad(2, 0, 2, 0);
 		table.row();
 
 		//Row 2
 		table.add();
-		table.add(inputButton).height((float) (screen_H * 0.05)).width((float) (screen_W * 0.3)).pad(2, 0, 2, 0);
+		
 		
 		table.setFillParent(true);
 		//	table.debug(); // turn on all debug lines (table, cell, and widget)

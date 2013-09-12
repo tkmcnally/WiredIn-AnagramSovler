@@ -1,0 +1,308 @@
+package com.tkmcnally.wordunscrambler.screens;
+
+import java.awt.Font;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
+
+import sun.font.TrueTypeFont;
+import aurelienribon.tweenengine.BaseTween;
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenCallback;
+import aurelienribon.tweenengine.TweenManager;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.SkinLoader;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane.ScrollPaneStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.tkmcnally.wordunscrambler.MyGdxGame;
+import com.tkmcnally.wordunscrambler.sprites.TextFieldAccessor;
+import com.tkmcnally.wordunscrambler.unscrambler.Unscrambler;
+
+public class MainMenu implements Screen {
+
+	private MyGdxGame game;
+	private SpriteBatch batch;
+	private Texture backgroundTexture;
+	private Image background;
+	private BitmapFont font_60,font_48;
+	private OrthographicCamera camera;
+	private Stage stage;
+	private Table table;
+	private TweenManager tweenManager;
+	private TweenCallback cb1;
+	
+	private HashMap<Integer, List<String>> unscrambledEntries = new HashMap<Integer, List<String>>();
+	private HashMap<Integer, List<String>> unscrambledEntriesOLD = new HashMap<Integer, List<String>>();
+
+	private Skin skin;
+
+	private Label scrambledLabel;
+	private Label unscrambledLabel;
+
+	private TextField input;
+
+	private TextButton inputButton;
+	private int screen_H = Gdx.graphics.getHeight();
+	private int screen_W = Gdx.graphics.getWidth();
+
+	private volatile Thread unscrambleThread;
+	// constructor to keep a reference to the main Game class
+	public MainMenu(MyGdxGame game){
+		this.game = game;
+		skin = game.manager.get("data/uiskin.json");
+		unscrambledLabel = new Label("Unscrambled Word:", skin);	
+	}
+	
+	@Override
+	public void render(float delta) {
+		Gdx.gl.glClearColor(1, 1, 1, 1);
+		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		tweenManager.update(delta);
+		
+		//DRAW STUFF
+		batch.begin();
+		
+		if(resultsChanged()) {
+			unscrambledEntriesOLD.clear();
+			unscrambledEntriesOLD.putAll(unscrambledEntries);
+			redrawResults();
+		}
+		stage.act();
+		stage.draw();
+		Table.drawDebug(stage);
+		
+		//END DRAWING STUFF
+		batch.end();
+
+	}
+	
+	public void redrawResults() {
+		Iterator<Integer> iter = unscrambledEntries.keySet().iterator();
+		final Table scrollTable = new Table();
+		int count = 0, num_lengths = 0;
+		List<Integer> keys = new ArrayList<Integer>();
+		
+		while(iter.hasNext()) {
+			int next_num = iter.next();
+			keys.add(next_num);
+			count = count + unscrambledEntries.get(next_num).size() + 1;
+		}
+		Collections.sort(keys);
+		
+		//Reset Table to original state.
+		resetTable();
+		
+		//Create labels for all solved words.
+		Label[] label = new Label[count];
+		
+		//Create iterator for solved entries.
+		iter = unscrambledEntries.keySet().iterator();
+		
+		//Create style for Label (Font, Color etc...)
+		LabelStyle lts = new LabelStyle();
+		lts.font = font_60;
+		int labelCount = 0;
+		//Populate labels with solved words and add to new ScrollTable.
+		for(int i = 0; i < keys.size(); i++) {			
+			Integer index = keys.get(i);
+			label[labelCount] = new Label(index + "-------", lts);
+			scrollTable.add(label[labelCount]);
+			labelCount++;
+		    scrollTable.row();
+			for(int k = 0; k < unscrambledEntries.get(index).size(); k++) {
+				label[labelCount] = new Label(unscrambledEntries.get(index).get(k), lts);
+				label[labelCount].scale(5);
+				scrollTable.add(label[labelCount]);
+				labelCount++;
+			    scrollTable.row();
+				
+			}
+		}
+		
+		//Add scrollPane to main Table.
+		ScrollPaneStyle sps = skin.get(ScrollPaneStyle.class);
+		sps.background = null;
+		ScrollPane scrollPane = new ScrollPane(scrollTable, sps);
+		table.row();
+		table.add(scrollPane).width((float) (screen_W * 0.8)).height((float) (screen_H * 0.5)).colspan(2);
+		table.debug();
+	}
+	
+	public boolean resultsChanged() {
+		if(!unscrambledEntriesOLD.equals(unscrambledEntries)) {
+			return true;
+		}	
+		return false;
+	}
+		
+	public void loadFont() {
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/CALIBRI.TTF"));	
+		font_60 = generator.generateFont(60);// font size 25 pixels
+		font_48 = generator.generateFont(48); 
+		generator.dispose();
+	}
+
+	public void createCallback(String[] unscrambled) {
+
+		cb1 = new TweenCallback() {
+			@Override
+			public void onEvent(int type, BaseTween<?> source) {
+			
+			}
+		};
+
+	}
+
+	public void resetTable() {
+		stage.clear();
+		table = new Table();
+		table.top().pad(10, 0, 0, 0);
+		
+		stage.addActor(background);
+		stage.addActor(table);
+
+		//Row 1
+		table.add(scrambledLabel).right().pad(2, 0, 2, 10);
+		table.add(input).height(screen_W * 0.15f).width(screen_W * 0.7f).pad(2, 0, 2, 0);
+		table.row();
+
+		//Row 2
+		table.add();
+		table.add(inputButton).height((float) (screen_H * 0.05)).width((float) (screen_W * 0.3)).pad(2, 0, 2, 0);
+
+		table.setFillParent(true);
+		table.debug(); // turn on all debug lines (table, cell, and widget)
+	}
+
+	@Override
+	public void show() {
+		stage = new Stage();
+		Gdx.input.setInputProcessor(stage);	
+		tweenManager = new TweenManager();
+		Tween.registerAccessor(TextField.class, new TextFieldAccessor());
+
+		camera = new OrthographicCamera(screen_W, screen_H);
+		camera.setToOrtho(false, screen_W, screen_H);
+
+		batch = new SpriteBatch();
+		
+		TextFieldStyle textFieldStyle1 = new TextFieldStyle();
+		textFieldStyle1.font = font_60;
+		textFieldStyle1.background = skin.getDrawable("textfield");
+		textFieldStyle1.fontColor = Color.WHITE;
+		input = new TextField("", textFieldStyle1);
+		
+		backgroundTexture = game.manager.get("data/bg_1920-1080.png");
+		background = new Image(backgroundTexture);
+
+		TextButtonStyle textButtonStyle1 = skin.get(TextButtonStyle.class);
+		textButtonStyle1.font = font_48;
+
+		inputButton = new TextButton("Unscramble!", textButtonStyle1);
+		inputButton.addListener( new ChangeListener() {
+			
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+			unscrambledEntries.clear();
+			unscrambleThread.s
+			unscrambleThread = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						unscrambledEntries.clear();
+						Unscrambler.unscrambleWord(game, input.getText().trim(), unscrambledEntries);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				
+			});
+			unscrambleThread.start();
+			}
+		});
+		//stage.setCamera(camera);
+		stage.addActor(background);
+
+		table = new Table();
+		stage.addActor(table);
+		table.top().pad(10, 0, 0, 0);
+		
+		
+		//Row 1
+		LabelStyle labelStyle1 = new LabelStyle();
+		labelStyle1.font = font_48;
+		labelStyle1.fontColor = Color.WHITE;
+		scrambledLabel = new Label("Scrambled \n    Word:", labelStyle1);
+		
+		table.add(scrambledLabel).pad(2, 0, 2, 10);
+		table.add(input).height(screen_W * 0.15f).width(screen_W * 0.7f).pad(2, 0, 2, 0);
+		table.row();
+
+		//Row 2
+		table.add();
+		table.add(inputButton).height((float) (screen_H * 0.05)).width((float) (screen_W * 0.3)).pad(2, 0, 2, 0);
+		
+		table.setFillParent(true);
+		//	table.debug(); // turn on all debug lines (table, cell, and widget)
+
+	}
+	
+	@Override
+	public void resize(int width, int height) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void resume() {
+		// TODO Auto-generated method stub
+
+	}
+
+
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void hide() {
+		batch.dispose();
+
+	}
+
+	@Override
+	public void pause() {
+		// TODO Auto-generated method stub
+
+	}
+}

@@ -30,7 +30,9 @@ public class Combinations {
 					char[] newArray = sb.toString().toCharArray();
 					Arrays.sort(newArray);
 					sortedWord = new String(newArray);
-					wordList.add(sortedWord);
+					if(!wordList.contains(sortedWord)) {
+						wordList.add(sortedWord);
+					}
 					sb.delete(0, sb.length());
 				}
 			}

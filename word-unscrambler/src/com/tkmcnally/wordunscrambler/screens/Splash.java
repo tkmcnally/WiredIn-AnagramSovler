@@ -87,14 +87,14 @@ public class Splash implements Screen {
 	@Override
 	public void show() {
 		game.manager.load("data/uiskin.json", Skin.class, new SkinLoader.SkinParameter("data/uiskin.atlas"));
-	    game.manager.load("data/bg_1920-1080.png", Texture.class);
+	    game.manager.load("data/bg_1920-10801.png", Texture.class);
 	    game.manager.load("data/wiredin.png", Texture.class);
 	    game.manager.finishLoading();
 		batch = new SpriteBatch();
 		tweenManager = new TweenManager(); 
 		Tween.registerAccessor(Sprite.class, new SpriteAccessor());
 		
-		backgroundTexture = game.manager.get("data/bg_1920-1080.png");
+		backgroundTexture = game.manager.get("data/bg_1920-10801.png");
 		background = new Sprite(backgroundTexture);
 		
 		logoTexture =  game.manager.get("data/wiredin.png");

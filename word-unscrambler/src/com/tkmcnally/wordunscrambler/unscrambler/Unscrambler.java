@@ -2,14 +2,12 @@ package com.tkmcnally.wordunscrambler.unscrambler;
 
 
 import java.io.IOException;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import java.util.ArrayList;
-
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -71,8 +69,10 @@ public class Unscrambler {
 				if(testing.size() > 0) {
 					if(unscrambledEntries.get(combinations.get(i).length()) == null) {
 						unscrambledEntries.put(combinations.get(i).length(), testing);
+						Collections.sort(unscrambledEntries.get(combinations.get(i).length()));
 					} else {
 						unscrambledEntries.get(combinations.get(i).length()).addAll(testing);
+						Collections.sort(unscrambledEntries.get(combinations.get(i).length()));
 					}
 				}
 			}

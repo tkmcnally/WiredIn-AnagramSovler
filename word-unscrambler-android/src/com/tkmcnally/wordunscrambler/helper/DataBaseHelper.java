@@ -53,7 +53,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	}
 
 	private void copydatabase() throws IOException{
-		Log.d("DATABASE", "123123");
+
 	    InputStream databaseInput = null;
 	    String outFileName = DB_PATH + DB_NAME;
 	    OutputStream databaseOutput = new FileOutputStream(outFileName);
@@ -66,64 +66,65 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	        databaseOutput.write(buffer, 0, length);
 	        databaseOutput.flush();
 	    }
-	    //databaseInput.close();
+	    databaseInput.close();
 
 	    databaseInput = resources.openRawResource(R.raw.testing2);
 	    while((length = databaseInput.read(buffer)) > 0) {
 	        databaseOutput.write(buffer);
 	        databaseOutput.flush();
 	    }
-	  //  databaseInput.close();
+	    databaseInput.close();
 	    databaseInput = resources.openRawResource(R.raw.testing3);
 	    while((length = databaseInput.read(buffer)) > 0) {
 	        databaseOutput.write(buffer, 0, length);
 	        databaseOutput.flush();
 	    }
-	//    databaseInput.close();
-
+	    databaseInput.close();
+	    
 	    databaseInput = resources.openRawResource(R.raw.testing4);
 	    while((length = databaseInput.read(buffer)) > 0) {
 	        databaseOutput.write(buffer);
 	        databaseOutput.flush();
 	    }
-	  //  databaseInput.close();
+	    databaseInput.close();
 	    databaseInput = resources.openRawResource(R.raw.testing5);
 	    while((length = databaseInput.read(buffer)) > 0) {
 	        databaseOutput.write(buffer, 0, length);
 	        databaseOutput.flush();
 	    }
-	   // databaseInput.close();
+	    databaseInput.close();
 
 	    databaseInput = resources.openRawResource(R.raw.testing6);
 	    while((length = databaseInput.read(buffer)) > 0) {
 	        databaseOutput.write(buffer);
 	        databaseOutput.flush();
 	    }
-	 //   databaseInput.close();
+	    databaseInput.close();
 	    databaseInput = resources.openRawResource(R.raw.testing7);
 	    while((length = databaseInput.read(buffer)) > 0) {
 	        databaseOutput.write(buffer, 0, length);
 	        databaseOutput.flush();
 	    }
-	 //   databaseInput.close();
+	    databaseInput.close();
 
 	    databaseInput = resources.openRawResource(R.raw.testing8);
 	    while((length = databaseInput.read(buffer)) > 0) {
 	        databaseOutput.write(buffer);
 	        databaseOutput.flush();
 	    }
-	    
+	    databaseInput.close();
 	    databaseInput = resources.openRawResource(R.raw.testing9);
 	    while((length = databaseInput.read(buffer)) > 0) {
 	        databaseOutput.write(buffer);
 	        databaseOutput.flush();
 	    }
-	    
+	    databaseInput.close();
 	    databaseInput = resources.openRawResource(R.raw.testing10);
 	    while((length = databaseInput.read(buffer)) > 0) {
 	        databaseOutput.write(buffer);
 	        databaseOutput.flush();
 	    }
+
 	    databaseInput.close();
 	    databaseOutput.flush();
 	    databaseOutput.close();
